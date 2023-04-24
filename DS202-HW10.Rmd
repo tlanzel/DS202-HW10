@@ -9,8 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Homework 10  
-### Tessa Lanzel  
+## Github: https://github.com/tlanzel/DS202-HW10
 
 ```{r}
 acc = read.csv("https://raw.githubusercontent.com/yumouqiu/DS202-Spring2023/main/Practice/data/fars2016/accident.csv")
@@ -30,56 +29,46 @@ view(acc)
 acc %>% group_by(DAY_WEEK) %>% count() %>% arrange(desc(n))
 ```
   
-The data shows that more accidents happen during the weekend, with the top two days being Friday and Saturday.The least accidents occur on Tuesdays.  
-
+The data shows that more accidents happen during the weekend, with the top two days being Friday and Saturday. The least accidents occur on Tuesdays.
 <br>  
 *What time of the day do accidents happen (use variable HOUR)?*    
 ```{r}
 acc %>% group_by(HOUR) %>% count() %>% arrange(desc(n))
 ```
 
-Accidents are more likely to occur at night, with the top three times being 18 (6:00 pm), 20 (8:00 pm), and 17 (5:00 pm). The highest number of accidents occur around 6:00 pm - which could possibly be due to rush hour traffic. The least amount of accidents occur at 4 (4:00 am).  
-
+Accidents are more likely to occur at night, with the top three times being 18 (6:00 pm), 20 (8:00 pm), and 17 (5:00 pm). The highest number of accidents occur around 6:00 pm - which could possibly be due to rush hour traffic. The least amount of accidents occur at 4 (4:00 am).
 <br>  
 *What is the number of accidents with at least one drunk driver (use variable DRUNK_DR)?*   
 ```{r}
 sum(acc$DRUNK_DR >= 1)
 ```
-The number of accidents with at least one drunk driver is 8720.  
-<br>  
-### Part 2
+The number of accidents with at least one drunk driver is 8720.
+<br> 
+
+### Part 2   
 *Connect to the person table. Identify drivers (PER_TYP == 1, see fars manual ) and subset on them.*  
 ```{r}
 per1 = person %>% filter(PER_TYP == 1)
 ```
-<br> 
+<br>
 
 *Join accident and driver table (work out which variable(s) to use)*  
 ```{r}
 acc.join = left_join(per1, acc, by = c("ST_CASE","HOUR"))
 View(acc.join)
 ```
-<br>
+<br>  
 
 *Tally the number of accidents by day of the week (DAY_WEEK), hour of the day (HOUR) and gender (SEX). Visualize the results!*  
 ```{r}
-acc.join %>%
-  group_by(DAY_WEEK) %>%
-  tally() %>%
-  ggplot(aes(x=DAY_WEEK, y=n)) + geom_bar(stat = 'identity') + labs(x='Day', y='Accidents')
+acc.join %>% group_by(DAY_WEEK) %>% tally() %>% ggplot(aes(x=DAY_WEEK, y=n)) + geom_bar(stat = 'identity')  + labs(x='Day', y='Accidents')
 
 acc.join$SEX <- as.factor(acc.join$SEX)
 levels(acc.join$SEX) <- c("Male", "Female", "Not Reported", "Unknown")
-acc.join %>%
-  filter(!((SEX=="Not Reported") | (SEX=="Unknown"))) %>%
-  group_by(SEX) %>%
-  tally() %>%
-  ggplot(aes(x=SEX, y=n)) + geom_bar(stat = 'identity') + labs(x='Sex', y='Accidents')
 
-acc.join %>%
-  filter(!HOUR==99) %>%
-  group_by(HOUR) %>%
-  tally() %>%
+acc.join %>%  filter(!((SEX=="Not Reported") | (SEX=="Unknown"))) %>% group_by(SEX) %>% tally() %>% ggplot(aes(x=SEX, y=n)) + geom_bar(stat = 'identity') + labs(x='Sex', y='Accidents')
+
+acc.join %>% filter(!HOUR==99) %>% group_by(HOUR) %>% tally() %>%
   ggplot(aes(x=HOUR, y=n)) + geom_bar(stat = 'identity') + labs(x='Hour', y='Accidents')
 ```
 
